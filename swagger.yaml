@@ -1,0 +1,139 @@
+swagger: '2.0'
+info:
+  title: Bank Argent API - Transactions
+  description: Contains all available API endpoints in this codebase
+  version: 1.0.0
+host: localhost:3001
+basePath: /api/transactions
+schemes:
+  - http
+
+paths:
+  /transactions/all:
+    get:
+      summary: Récupérer toutes les transactions du mois en cours groupées par compte
+      description: Cette endpoint permet aux utilisateurs de visualiser toutes leurs transactions pour le mois en cours, groupées par compte.
+      parameters:
+        - in: header
+          name: Authorization
+          description: Attach Bearer JWT token
+          required: true
+          type: string
+      responses:
+        200:
+          description: Succès - Liste des transactions récupérée avec succès.
+          schema:
+            type: array
+            items:
+              properties:
+                id:
+                  type: number
+                account:
+                  type: string
+                amount:
+                  type: number
+        500:
+          description: Erreur serveur - Impossible de récupérer les transactions.
+
+  /transactions/{transactionId}:
+    get:
+      summary: Récupérer les détails d'une transaction
+      description: Cette endpoint permet aux utilisateurs de visualiser les détails d'une transaction spécifique.
+      parameters:
+        - name: Authorization
+          in: header
+          description: Attach Bearer JWT token
+          required: true
+          type: string
+        - name: transactionId
+          in: path
+          description: ID de la transaction à récupérer
+          required: true
+          type: number
+      responses:
+        200:
+          description: Succès - Détails de la transaction récupérés avec succès.
+          schema:
+            $ref: '#/definitions/Transaction'
+        404:
+          description: Non trouvé - La transaction spécifiée n'a pas été trouvée.
+        500:
+          description: Erreur serveur - Impossible de récupérer les détails de la transaction.
+
+    put:
+      summary: Mettre à jour les informations d'une transaction
+      description: Cette endpoint permet aux utilisateurs de mettre à jour les informations d'une transaction spécifique.
+      parameters:
+        - name: transactionId
+          in: path
+          description: ID de la transaction à mettre à jour
+          required: true
+          type: number
+        - name: body
+          in: body
+          description: Nouvelles informations de la transaction
+          required: true
+          schema:
+            $ref: '#/definitions/Transaction'
+        - name: categoryId
+          in: query
+          description: ID de la catégorie (paramètre optionnel)
+          required: false
+          type: number
+        - name: note
+          in: query
+          description: String de la note (paramètre optionnel)
+          required: false
+          type: string
+      responses:
+        200:
+          description: Succès - Transaction mise à jour avec succès.
+          schema:
+            $ref: '#/definitions/Transaction'
+        400:
+          description: Requête invalide - Les données de la transaction sont incorrectes.
+        404:
+          description: Non trouvé - La transaction spécifiée n'a pas été trouvée.
+        500:
+          description: Erreur serveur - Impossible de mettre à jour la transaction.
+
+    delete:
+      summary: Supprimer une transaction
+      description: Cette endpoint permet aux utilisateurs de supprimer une transaction spécifique.
+      parameters:
+        - name: transactionId
+          in: path
+          description: ID de la transaction à supprimer
+          required: true
+          type: number
+      responses:
+        204:
+          description: Aucun contenu - Transaction supprimée avec succès.
+        404:
+          description: Non trouvé - La transaction spécifiée n'a pas été trouvée.
+        500:
+          description: Erreur serveur - Impossible de supprimer la transaction.
+
+definitions:
+  Transaction:
+    type: object
+    properties:
+      id:
+        type: number
+      account:
+        type: string
+      amount:
+        type: number
+      date:
+        type: string
+      description:
+        type: string
+      category:
+        type: number
+      notes:
+        type: string
+    required:
+      - id
+      - account
+      - amount
+      - date
